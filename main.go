@@ -53,9 +53,9 @@ func timedRate(pair string, t time.Time) (float64, error) {
 func main() {
 	var fname string
 	var pair string
-	var span uint
+	var span int
 	flag.StringVar(&fname, "input", "input.csv", "input CSV filename")
-	flag.UintVar(&span, "span", 1, "interval of days across from start to end")
+	flag.IntVar(&span, "span", 0, "interval of days across from start to end (0 is auto)")
 	flag.StringVar(&pair, "pair", "btc_jpy", "pair name")
 	flag.Parse()
 
@@ -94,6 +94,18 @@ func main() {
 
 	y, m, d := inputs[0].time.Date()
 	curr := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
+	if span <= 0 {
+		if len(inputs) >= 2 {
+			y, m, d := inputs[len(inputs)-1].time.Date()
+			end := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
+			span = int(end.Sub(curr).Hours()/24) / 30
+			if span < 1 {
+				span = 1
+			}
+		} else {
+			span = 1
+		}
+	}
 	curr = curr.AddDate(0, 0, int(span))
 	prev := curr
 
