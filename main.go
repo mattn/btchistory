@@ -112,13 +112,11 @@ func main() {
 	total := 0.0
 	for {
 		curr = curr.AddDate(0, 0, int(span))
-		over := 0
 		for _, i := range inputs {
 			if i.time.Before(curr) {
 				if prev.Before(i.time) {
 					total += i.in
 				}
-				over++
 			}
 		}
 		r, err := timedRate(pair, curr)
