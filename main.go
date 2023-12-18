@@ -110,12 +110,21 @@ func main() {
 	prev := curr
 
 	total := 0.0
+	total_at := 0.0
+
+	fmt.Println("日時\tレート\t資産\t含み益")
 	for {
 		curr = curr.AddDate(0, 0, int(span))
 		for _, i := range inputs {
 			if i.time.Before(curr) {
 				if prev.Before(i.time) {
 					total += i.in
+					rate_at, err := timedRate(pair, curr)
+					if err != nil {
+						fmt.Println(err)
+						break
+					}
+					total_at += i.in * rate_at
 				}
 			}
 		}
@@ -123,7 +132,7 @@ func main() {
 		if err != nil {
 			break
 		}
-		fmt.Printf("%s\t%f\t%f\n", curr.Format(`2006-01-02`), r, total*r)
+		fmt.Printf("%s\t%f\t%f\t%f\n", curr.Format(`2006-01-02`), r, total*r, total*r-total_at)
 		prev = curr
 		if time.Now().Before(curr) {
 			break
